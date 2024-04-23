@@ -279,6 +279,35 @@ class SocialNetwork2 {
         return eigenvectorCentrality;
     }
 
+    // Convert the network to a Graphviz representation
+    public String toGraphviz() {
+        StringBuilder graphvizBuilder = new StringBuilder();
+        graphvizBuilder.append("graph theConnections {\n");
+
+        HashSet<String> addedEdges = new HashSet<>(); // Set to track added edges
+
+        // Loop through the adjacency list
+        for (User user : adjacencyList.keySet()) {
+            List<User> connections = adjacencyList.get(user);
+
+            // Add edges to the Graphviz representation
+            for (User connection : connections) {
+                String edge = user.name + " -- " + connection.name; // Define the edge
+
+                // Check if this edge has been added to avoid duplicates
+                if (!addedEdges.contains(edge)) {
+                    graphvizBuilder.append("    ").append(edge).append(";\n"); // Add the edge to the graph
+                    addedEdges.add(edge); // Mark this edge as added
+                }
+            }
+        }
+
+        graphvizBuilder.append("}"); // Close the Graphviz graph
+        System.out.println(graphvizBuilder);
+        return graphvizBuilder.toString(); // Return the Graphviz-compatible string
+    }
+
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         SocialNetwork2 socialNetwork = new SocialNetwork2();
@@ -377,6 +406,7 @@ class SocialNetwork2 {
                                 break; 
                             case 3:
                                 try {
+
                                     socialNetwork.showPosts(name1);
                                 } catch (UserNotFoundException e) {
                                     System.out.println(e.getMessage());
@@ -471,10 +501,11 @@ class SocialNetwork2 {
                     }    
                     break;
                 case 9:
+                    socialNetwork.toGraphviz();
+                    break;
+                case 10:
                     System.exit(0);
             }
         }
     }
 }
-
-
