@@ -4,6 +4,7 @@ import Exceptions.UserNotFoundException;
 import Post.Post;
 import User.User;
 
+import java.sql.SQLOutput;
 import java.util.*;
 
 class SocialNetwork2 {
@@ -13,8 +14,8 @@ class SocialNetwork2 {
         adjacencyList = new HashMap<>();
     }
 
-    public void addUser(String name) {
-        User user = new User(name);
+    public void addUser(String name, String password) {
+        User user = new User(name, password);
         adjacencyList.put(user, new ArrayList<>());
     }
 
@@ -64,11 +65,13 @@ class SocialNetwork2 {
     public void showFriends(String name) throws UserNotFoundException {
         User user = getUserByName(name);
         if (user != null) {
-            Set<User> visited = new HashSet<>();
+            Set<String> visited = new HashSet<>();
             System.out.println("Direct friends of " + name + ":");
             for (User friend : adjacencyList.get(user)) {
-                System.out.println(friend.name);
+                visited.add(friend.name);
             }
+            System.out.println(visited);
+
         } else {
             throw new UserNotFoundException("User.User not found.");
         }
@@ -240,6 +243,16 @@ class SocialNetwork2 {
         return degreeCentrality;
     }
 
+    public boolean isAuthenticatedUser(String name, String password) {
+        User user = getUserByName(name);
+
+        if (user.password.equals(password)) {
+            return true;
+        }
+        System.out.println("Unauthorized User\n Invalid Credentials");
+        return false;
+    }
+
     public Map<String, Double> calculateEigenvectorCentrality() {
         Map<String, Double> eigenvectorCentrality = new HashMap<>();
         int maxIterations = 100;
@@ -281,7 +294,7 @@ class SocialNetwork2 {
     }
 
     // Convert the network to a Graphviz representation
-    public String toGraphviz() {
+    public void toGraphviz() {
         StringBuilder graphvizBuilder = new StringBuilder();
         graphvizBuilder.append("graph theConnections {\n"); // 'digraph' denotes a directed graph
 
@@ -305,60 +318,58 @@ class SocialNetwork2 {
         }
         graphvizBuilder.append("}");
         System.out.println(graphvizBuilder);
-        return graphvizBuilder.toString();
     }
 
-        public static void main(String[] args) throws UserNotFoundException {
+    public static void main(String[] args) throws UserNotFoundException {
         Scanner scanner = new Scanner(System.in);
         SocialNetwork2 socialNetwork = new SocialNetwork2();
-        socialNetwork.addUser("Gore");
-        socialNetwork.addUser("Om");
-        socialNetwork.addUser("Sanskar");
-        socialNetwork.addUser("Asawari");
+        socialNetwork.addUser("Gore", "123");
+        socialNetwork.addUser("Om", "123");
+        socialNetwork.addUser("Sanskar", "123");
+        socialNetwork.addUser("Asawari", "123");
+        socialNetwork.addUser("John", "123");
+        socialNetwork.addUser("Alice", "123");
+        socialNetwork.addUser("Bob", "123");
+        socialNetwork.addUser("Emma", "123");
+        socialNetwork.addUser("Ella", "123");
 
         socialNetwork.addFriend("Gore", "Sanskar");
         socialNetwork.addFriend("Sanskar", "Om");
         socialNetwork.addFriend("Om", "Asawari");
         socialNetwork.addFriend("Asawari", "Gore");
+        socialNetwork.addFriend("John", "Gore");
+        socialNetwork.addFriend("John", "Alice");
+        socialNetwork.addFriend("Alice", "Bob");
+        socialNetwork.addFriend("Bob", "Emma");
+        socialNetwork.addFriend("Emma", "Ella");
 
         int choice;
-        String name1, name2, postContent;
+        String name1, name2, postContent, init_password;
         while (true) {
             System.out.println(" =========================================== ");
             System.out.println("|            SOCIAL NETWORK MENU            |");
             System.out.println(" =========================================== ");
             System.out.println("|   1\t| Add User\t\t\t\t\t\t\t|");
-            System.out.println("|   2\t| Add Friend\t\t\t\t\t\t|");
-            System.out.println("|   3\t| Show Posts\t\t\t\t\t\t|");
-            System.out.println("|   4\t| Show Friends\t\t\t\t\t\t|");
-            System.out.println("|   5\t| User Functionality\t\t\t\t|");
-            System.out.println("|   6\t| Show User Details\t\t\t\t\t|");
-            System.out.println("|   7\t| Degree Centrality Users\t\t\t|");
-            System.out.println("|   8\t| Eigenvector Centrality Users\t\t|");
-            System.out.println("|   9\t| Print Network\t\t\t\t\t\t|");
-            System.out.println("|   10\t| Exit\t\t\t\t\t\t\t\t|");
+            System.out.println("|   2\t| Show Posts\t\t\t\t\t\t|");
+            System.out.println("|   3\t| Show Friends\t\t\t\t\t\t|");
+            System.out.println("|   4\t| User Functionality\t\t\t\t|");
+            System.out.println("|   5\t| Show User Details\t\t\t\t\t|");
+            System.out.println("|   6\t| Degree Centrality Users\t\t\t|");
+            System.out.println("|   7\t| Print Network\t\t\t\t\t\t|");
+            System.out.println("|   8\t| Exit\t\t\t\t\t\t\t\t|");
             System.out.println(" =========================================== ");
             System.out.print("\n\nEnter your choice: ");
             choice = scanner.nextInt();
             switch (choice) {
                 case 1:
-                    System.out.print("\nEnter the name of the user: ");
+                    System.out.print("\nEnter the name of the user & password: ");
                     name1 = scanner.next();
+                    init_password = scanner.next();
                     System.out.println();
-                    socialNetwork.addUser(name1);
+                    socialNetwork.addUser(name1, init_password);
+                    System.out.println("User Created Successfully !!!");
                     break;
                 case 2:
-                    try {
-                        System.out.print("\nEnter the names of the users (separated by space): ");
-                        name1 = scanner.next();
-                        name2 = scanner.next();
-                        System.out.println();
-                        socialNetwork.addFriend(name1, name2);
-                    } catch (UserNotFoundException e) {
-                        System.out.println(e.getMessage());
-                    }
-                    break;
-                case 3:
                     try {
                         System.out.print("\nEnter the name of the user: ");
                         name1 = scanner.next();
@@ -368,7 +379,7 @@ class SocialNetwork2 {
                         System.out.println(e.getMessage());
                     }
                     break;
-                case 4:
+                case 3:
                     try {
                         System.out.print("\nEnter the name of the user: ");
                         name1 = scanner.next();
@@ -378,134 +389,142 @@ class SocialNetwork2 {
                         System.out.println(e.getMessage());
                     }
                     break;
-                case 5:
+                case 4:
                     boolean flag11 = true;
-                    System.out.print("\nEnter the names of the users : ");
+                    System.out.print("\nEnter the names of the user : ");
                     name1 = scanner.next();
-                    while(flag11){
-                        System.out.println("------------------------------------------------");
-                        System.out.println("|  Option  |          Description               |");
-                        System.out.println("------------------------------------------------");
-                        System.out.println("|    1     |  Add friend                        |");
-                        System.out.println("|    2     |  Add post                          |");
-                        System.out.println("|    3     |  Show posts                        |");
-                        System.out.println("|    4     |  Show friends                      |");
-                        System.out.println("|    5     |  Show mutual                       |");
-                        System.out.println("|    6     |  Remove friend                     |");
-                        System.out.println("|    7     |  Suggest friends                   |");
-                        System.out.println("|    8     |  Like post                         |");
-                        System.out.println("|    9     |  Follow user                       |");
-                        System.out.println("|   10     |  Unfollow user                     |");
-                        System.out.println("|   11     |  Exit                              |");
-                        System.out.println("------------------------------------------------");
+
+                    System.out.print("Enter the Password : ");
+                    String password = scanner.next();
+                    System.out.println();
+                    if (socialNetwork.isAuthenticatedUser(name1, password)) {
 
 
-                        System.out.print("\n\nEnter your choice: ");
-                        System.out.println();
-                        choice = scanner.nextInt();
-                        switch (choice) {
-                            case 1:
-                                try {
-                                    System.out.print("\nEnter the names of the users to be friends with: ");
-                                    name2 = scanner.next();
-                                    System.out.println();
-                                    socialNetwork.addFriend(name1, name2);
-                                } catch (UserNotFoundException e) {
-                                    System.out.println(e.getMessage());
-                                }
-                                break;
-                            case 2:
-                                try {
-                                    System.out.print("\nEnter the post content: ");
-                                    scanner.nextLine(); // Consume newline
-                                    postContent = scanner.nextLine();
-                                    System.out.println();
-                                    socialNetwork.addPost(name1, postContent);
-                                } catch (UserNotFoundException e) {
-                                    System.out.println(e.getMessage());
-                                }
-                                break;
-                            case 3:
-                                try {
-                                    System.out.println();
-                                    socialNetwork.showPosts(name1);
-                                    System.out.println();
-                                } catch (UserNotFoundException e) {
-                                    System.out.println(e.getMessage());
-                                }
-                                break;
-                            case 4:
-                                try {
-                                    System.out.println();
-                                    socialNetwork.showFriends(name1);
-                                    System.out.println();
-                                } catch (UserNotFoundException e) {
-                                    System.out.println(e.getMessage());
-                                }
-                                break;
-                            case 5:
-                                try {
-                                    System.out.print("\nEnter the names of the user to show mutuals: ");
-                                    name2 = scanner.next();
-                                    System.out.println();
-                                    socialNetwork.showMutuals(name1, name2);
-                                } catch (UserNotFoundException e) {
-                                    System.out.println(e.getMessage());
-                                }
-                                break;
-                            case 6:
-                                try {
-                                    System.out.print("\nEnter the names of the user to remove friends: ");
-                                    name2 = scanner.next();
-                                    System.out.println();
-                                    socialNetwork.removeFriend(name1, name2);
-                                } catch (UserNotFoundException e) {
-                                    System.out.println(e.getMessage());
-                                }
-                                break;
-                            case 7:
-                                try {
-                                    System.out.println();
-                                    socialNetwork.suggestFriendsCommonNeighbor(name1);
-                                    System.out.println();
-                                } catch (UserNotFoundException e) {
-                                    System.out.println(e.getMessage());
-                                }
-                                break;
-                            case 8:
-                                try {
-                                    System.out.print("Enter the name of the post owner: ");
-                                    name2 = scanner.next();
-                                    socialNetwork.likePost(name1, name2);
-                                } catch (UserNotFoundException e) {
-                                    System.out.println(e.getMessage());
-                                }
-                                break;
-                            case 9:
-                                try {
-                                    System.out.print("Enter the name of the followed: ");
-                                    name2 = scanner.next();
-                                    socialNetwork.followUser(name1, name2);
-                                } catch (UserNotFoundException e) {
-                                    System.out.println(e.getMessage());
-                                }
-                                break;
-                            case 10:
-                                try {
-                                    System.out.print("Enter the name of the followed: ");
-                                    name2 = scanner.next();
-                                    socialNetwork.unfollowUser(name1, name2);
-                                } catch (UserNotFoundException e) {
-                                    System.out.println(e.getMessage());
-                                }
-                                break;
-                            case 11:
-                                flag11 = false;
-                                break;
+                        while (flag11) {
+                            System.out.println(" =============================================== ");
+                            System.out.println("|  Option  |          Description               |");
+                            System.out.println(" =============================================== ");
+                            System.out.println("|    1     |  Add friend                        |");
+                            System.out.println("|    2     |  Add post                          |");
+                            System.out.println("|    3     |  Show posts                        |");
+                            System.out.println("|    4     |  Show friends                      |");
+                            System.out.println("|    5     |  Show mutual                       |");
+                            System.out.println("|    6     |  Remove friend                     |");
+                            System.out.println("|    7     |  Suggest friends                   |");
+                            System.out.println("|    8     |  Like post                         |");
+                            System.out.println("|    9     |  Follow user                       |");
+                            System.out.println("|   10     |  Unfollow user                     |");
+                            System.out.println("|   11     |  Exit                              |");
+                            System.out.println("------------------------------------------------");
+
+
+                            System.out.print("\n\nEnter your choice: ");
+                            System.out.println();
+                            choice = scanner.nextInt();
+                            switch (choice) {
+                                case 1:
+                                    try {
+                                        System.out.print("\nEnter the names of the users to be friends with: ");
+                                        name2 = scanner.next();
+                                        System.out.println();
+                                        socialNetwork.addFriend(name1, name2);
+                                    } catch (UserNotFoundException e) {
+                                        System.out.println(e.getMessage());
+                                    }
+                                    break;
+                                case 2:
+                                    try {
+                                        System.out.print("\nEnter the post content: ");
+                                        scanner.nextLine(); // Consume newline
+                                        postContent = scanner.nextLine();
+                                        System.out.println();
+                                        socialNetwork.addPost(name1, postContent);
+                                    } catch (UserNotFoundException e) {
+                                        System.out.println(e.getMessage());
+                                    }
+                                    break;
+                                case 3:
+                                    try {
+                                        System.out.println();
+                                        socialNetwork.showPosts(name1);
+                                        System.out.println();
+                                    } catch (UserNotFoundException e) {
+                                        System.out.println(e.getMessage());
+                                    }
+                                    break;
+                                case 4:
+                                    try {
+                                        System.out.println();
+                                        socialNetwork.showFriends(name1);
+                                        System.out.println();
+                                    } catch (UserNotFoundException e) {
+                                        System.out.println(e.getMessage());
+                                    }
+                                    break;
+                                case 5:
+                                    try {
+                                        System.out.print("\nEnter the names of the user to show mutuals: ");
+                                        name2 = scanner.next();
+                                        System.out.println();
+                                        socialNetwork.showMutuals(name1, name2);
+                                    } catch (UserNotFoundException e) {
+                                        System.out.println(e.getMessage());
+                                    }
+                                    break;
+                                case 6:
+                                    try {
+                                        System.out.print("\nEnter the names of the user to remove friends: ");
+                                        name2 = scanner.next();
+                                        System.out.println();
+                                        socialNetwork.removeFriend(name1, name2);
+                                    } catch (UserNotFoundException e) {
+                                        System.out.println(e.getMessage());
+                                    }
+                                    break;
+                                case 7:
+                                    try {
+                                        System.out.println();
+                                        socialNetwork.suggestFriendsCommonNeighbor(name1);
+                                        System.out.println();
+                                    } catch (UserNotFoundException e) {
+                                        System.out.println(e.getMessage());
+                                    }
+                                    break;
+                                case 8:
+                                    try {
+                                        System.out.print("Enter the name of the post owner: ");
+                                        name2 = scanner.next();
+                                        socialNetwork.likePost(name1, name2);
+                                    } catch (UserNotFoundException e) {
+                                        System.out.println(e.getMessage());
+                                    }
+                                    break;
+                                case 9:
+                                    try {
+                                        System.out.print("Enter the name of the followed: ");
+                                        name2 = scanner.next();
+                                        socialNetwork.followUser(name1, name2);
+                                    } catch (UserNotFoundException e) {
+                                        System.out.println(e.getMessage());
+                                    }
+                                    break;
+                                case 10:
+                                    try {
+                                        System.out.print("Enter the name of the followed: ");
+                                        name2 = scanner.next();
+                                        socialNetwork.unfollowUser(name1, name2);
+                                    } catch (UserNotFoundException e) {
+                                        System.out.println(e.getMessage());
+                                    }
+                                    break;
+                                case 11:
+                                    flag11 = false;
+                                    break;
+                            }
                         }
                     }
                     break;
-                case 6:
+                case 5:
                     try {
                         System.out.print("Enter the name of the user: ");
                         name1 = scanner.next();
@@ -514,24 +533,17 @@ class SocialNetwork2 {
                         System.out.println(e.getMessage());
                     }
                     break;
-                case 7:
+                case 6:
                     System.out.println("Degree Centrality:");
                     Map<String, Double> degreeCentrality = socialNetwork.calculateDegreeCentrality();
                     for (Map.Entry<String, Double> entry : degreeCentrality.entrySet()) {
                         System.out.println(entry.getKey() + ": " + entry.getValue());
                     }
                     break;
-                case 8:
-                    System.out.println("eigenvector Centrality:");
-                    Map<String, Double> eigenVectorCentality = socialNetwork.calculateEigenvectorCentrality();
-                    for (Map.Entry<String, Double> entry : eigenVectorCentality.entrySet()) {
-                        System.out.println(entry.getKey() + ": " + entry.getValue());
-                    }
-                    break;
-                case 9:
+                case 7:
                     socialNetwork.toGraphviz();
                     break;
-                case 10:
+                case 8:
                     System.exit(0);
             }
         }

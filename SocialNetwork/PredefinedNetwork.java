@@ -7,13 +7,13 @@ public class PredefinedNetwork {
         SocialNetwork2 socialNetwork = new SocialNetwork2();
 
 //      Users Created
-        socialNetwork.addUser("Om Gore");
-        socialNetwork.addUser("Om Gujarathi");
-        socialNetwork.addUser("Sanskar Gundecha");
-        socialNetwork.addUser("Asawari Jadhav");
+        socialNetwork.addUser("Om", "123");
+        socialNetwork.addUser("Gujarathi", "123");
+        socialNetwork.addUser("Sanskar", "123");
+        socialNetwork.addUser("Asawari", "123");
 
-        socialNetwork.addFriend("Om Gore", "Sanskar Gundecha");
-        socialNetwork.addFriend("Om Gore", "Om Gujarathi");
+        socialNetwork.addFriend("Om", "Sanskar");
+        socialNetwork.addFriend("Om", "Gujarathi");
 
         socialNetwork.showPosts("Om Gore");
     }

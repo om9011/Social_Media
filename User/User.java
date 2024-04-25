@@ -10,9 +10,11 @@ public class User {
     public Set<User> followers;
     public Set<User> follows;
     public int likes;
+    public final String password;
 
-    public User(String name) {
+    public User(String name, String password) {
         this.name = name;
+        this.password = password;
         this.posts = null;
         this.followers = new HashSet<>();
         this.follows = new HashSet<>();
